@@ -12,9 +12,32 @@
   "app": {
     "windows": [
       {
-        "title": "desktop-apps",
-        "width": 800,
-        "height": 600
+        "title": "receipt",
+        "url": "reciept/index.html",
+        "visible": false,
+        "width": 300,
+        "height": 500
+      },
+      {
+        "title": "table",
+        "url": "table/index.html",
+        "visible": false,
+        "width": 300,
+        "height": 500
+      },
+      {
+        "title": "photobooth",
+        "url": "photobooth/index.html",
+        "visible": false,
+        "width": 300,
+        "height": 500
+      },
+      {
+        "title": "spotify",
+        "url": "spotify/index.html",
+        "visible": false,
+        "width": 300,
+        "height": 500
       }
     ],
     "security": {
