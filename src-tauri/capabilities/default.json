@@ -2,9 +2,32 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main"],
+  "windows": ["receipt", "table"],
   "permissions": [
     "core:default",
-    "opener:default"
+    "opener:default",
+    "sql:default",
+    "sql:allow-load",
+    "sql:allow-execute",
+    "sql:allow-select",
+    "dialog:default",
+    "fs:default",
+    "core:window:allow-start-dragging",
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [{ "path": "$DESKTOP/**" }]
+    },
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [{ "path": "$HOME/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/**" }]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [{ "path": "$HOME/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/**" }]
+    },
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "$HOME/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/**" }]
+    }
   ]
 }

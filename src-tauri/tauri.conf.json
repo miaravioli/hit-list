@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "desktop-apps",
+  "productName": "hit-list",
   "version": "0.1.0",
-  "identifier": "com.mia.desktop-apps",
+  "identifier": "com.mia.hit-list",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -10,34 +10,37 @@
     "frontendDist": "../build"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
+        "label": "receipt",
         "title": "receipt",
-        "url": "reciept/index.html",
+        "url": "receipt",
         "visible": false,
-        "width": 300,
-        "height": 500
+        "width": 350,
+        "height": 500,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "x": 30,
+        "y": 60,
+        "resizable": false,
+        "dragDropEnabled": false
       },
       {
+        "label": "table",
         "title": "table",
-        "url": "table/index.html",
+        "url": "table",
         "visible": false,
-        "width": 300,
-        "height": 500
-      },
-      {
-        "title": "photobooth",
-        "url": "photobooth/index.html",
-        "visible": false,
-        "width": 300,
-        "height": 500
-      },
-      {
-        "title": "spotify",
-        "url": "spotify/index.html",
-        "visible": false,
-        "width": 300,
-        "height": 500
+        "width": 600,
+        "height": 400,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "x": 880,
+        "y": 545,
+        "resizable": false,
+        "dragDropEnabled": false
       }
     ],
     "security": {
@@ -53,6 +56,9 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "macOS": {
+      "infoPlist": "Info.plist"
+    }
   }
 }
