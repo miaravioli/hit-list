@@ -293,6 +293,14 @@
     );
   }
 
+  //prevent removed edits
+  const saveTimers: Record<number, ReturnType<typeof setTimeout>> = {};
+
+  function queueTitleSave(id: number, title: string) {
+    clearTimeout(saveTimers[id]);
+    saveTimers[id] = setTimeout(() => updateTaskTitle(id, title), 300);
+  }
+
   let importing = false;
   async function importInbox() {
     if (!db || importing) return;
@@ -312,7 +320,7 @@
       await db.execute(`CREATE TABLE IF NOT EXISTS inbox_seen (key TEXT PRIMARY KEY)`);
 
       let position = tasks.length;
-      let added = 0;
+      const newTasks: Task[] = [];
 
       for (const line of lines) {
         const seen = await db.execute(
@@ -324,16 +332,18 @@
         const sep = line.indexOf('|');
         const title = sep > 0 ? line.slice(sep + 1).trim() : line;
 
-        await db.execute(
+        const res = await db.execute(
           `INSERT INTO task (task, date, status, source, position, highlighted)
           VALUES ($1, NULL, 'add', 'receipt', $2, 0)`,
           [title, position++]
         );
-        added++;
+        if (res.lastInsertId !== undefined) {
+          newTasks.push({ id: res.lastInsertId, title, done: false, highlighted: false });
+        }
       }
 
-      if (added > 0) {
-        await loadReceiptTasks();
+      if (newTasks.length > 0) {
+        tasks = [...tasks, ...newTasks];
         await updateWindowSize();
         await exportTasks();
       }
@@ -460,7 +470,6 @@
       await importInbox();
       await loadEvents();
       await updateWindowSize();
-      await loadReceiptTasks();
       await exportTasks();
     });
 
@@ -531,6 +540,7 @@
               bind:value={task.title}
               bind:this={inputRefs[task.id]}
               disabled={mode !== 'none'}
+              oninput={(e) => queueTitleSave(task.id, e.currentTarget.value)}
               onchange={(e) => updateTaskTitle(task.id, e.currentTarget.value)}
             />
           </div>
