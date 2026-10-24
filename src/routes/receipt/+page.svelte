@@ -63,8 +63,23 @@
 
   let inputRefs = $state<Record<number, HTMLInputElement>>({});
 
+  function handleTaskKeyDown(e: KeyboardEvent, task: Task, index: number) {
+    if ((e.key === 'Backspace' || e.key === 'Delete') && task.title === '') { // remove empty task
+      if (e.repeat) return;  // ignore auto-repeat
+      e.preventDefault();
+      deleteTask(index);
+      return;
+    }
+
+    if (e.key === 'Enter') { // add task to following index
+      e.preventDefault();
+      e.stopPropagation();
+      addTask(index + 1);
+    }
+  }
+
   function handleKeyDown(e: KeyboardEvent) {
-    if (mode === 'order' && selectedId !== null) {
+    if (mode === 'order' && selectedId !== null) { // re-ordering task mode
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault();
         const i = tasks.findIndex(t => t.id === selectedId);
@@ -77,7 +92,7 @@
       }
     }
 
-    if (e.key === 'Escape') {
+    if (e.key === 'Escape') { // add task to end of list
       addTask();
     }
   }
@@ -369,20 +384,48 @@
     }
   }
 
-  async function addTask() {
+  async function addTask(index: number = tasks.length) {
     const result = await db.execute(
       `INSERT INTO task (task, date, status, source, position, highlighted)
        VALUES ($1, $2, $3, $4, $5, 0)`,
-      ['', null, 'add', 'receipt', tasks.length]
+      ['', null, 'add', 'receipt', index]
     );
 
     const newId = result.lastInsertId;
     if (newId === undefined) return;
-    tasks = [...tasks, { id: newId, title: '', done: false, highlighted: false }];
+
+    const newTask: Task = { id: newId, title: '', done: false, highlighted: false };
+    tasks = [...tasks.slice(0, index), newTask, ...tasks.slice(index)];
+
+    if (index < tasks.length - 1) {
+      await savePositions();
+    }
 
     await tick();
     await updateWindowSize();
     inputRefs[newId]?.focus({ preventScroll: true });
+  }
+
+  async function deleteTask(index: number) {
+    const task = tasks[index];
+
+    // cancel potential title save for this task
+    clearTimeout(saveTimers[task.id]);
+
+    await db.execute('DELETE FROM task WHERE id = $1', [task.id]);
+    tasks = tasks.filter(t => t.id !== task.id);
+
+    await savePositions();
+    await tick();
+    await updateWindowSize();
+
+    // move cursor above
+    const prev = tasks[index - 1] ?? tasks[0];
+    if (prev) {
+      const el = inputRefs[prev.id];
+      el?.focus({ preventScroll: true });
+      el?.setSelectionRange(el.value.length, el.value.length); // cursor at end of text
+    }
   }
 
   async function loadReceiptTasks() {
@@ -542,6 +585,7 @@
               disabled={mode !== 'none'}
               oninput={(e) => queueTitleSave(task.id, e.currentTarget.value)}
               onchange={(e) => updateTaskTitle(task.id, e.currentTarget.value)}
+              onkeydown={(e) => handleTaskKeyDown(e, task, i)}
             />
           </div>
           <input
