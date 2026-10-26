@@ -169,7 +169,7 @@
           <td class="status"><span class="box">${STATUS_SYMBOL[t.status] ?? ''}</span></td>
         </tr>`)
           .join('')
-      : `<tr><td class="empty" colspan="3">nothing in the next 3 days</td></tr>`;
+      : `<tr><td class="empty" colspan="3">nothing in the next 7 days</td></tr>`;
 
     const html = `<!DOCTYPE html>
 <html lang="en">
@@ -299,7 +299,7 @@
   async function getUpcomingTableTasks(): Promise<UpcomingTableTask[]> {
     const today = new Date();
     const timeWindow = new Date();
-    timeWindow.setDate(today.getDate() + 3);
+    timeWindow.setDate(today.getDate() + 7);
 
     return await db.select<UpcomingTableTask[]>(
       `SELECT id, task, date(date) AS date, status, category FROM listAll
