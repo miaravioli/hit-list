@@ -86,13 +86,13 @@
         moveTask(i, e.key === 'ArrowUp' ? -1 : 1);
         return;
       }
-      if (e.key === 'Escape') {
+      if (e.key === 'Fn') {
         selectedId = null;
         return;
       }
     }
 
-    if (e.key === 'Escape') { // add task to end of list
+    if (e.key === 'Fn') { // add task to end of list
       addTask();
     }
   }
