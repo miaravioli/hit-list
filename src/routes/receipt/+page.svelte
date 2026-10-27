@@ -86,13 +86,13 @@
         moveTask(i, e.key === 'ArrowUp' ? -1 : 1);
         return;
       }
-      if (e.key === 'Fn') {
+      if (e.key === 'Control') {
         selectedId = null;
         return;
       }
     }
 
-    if (e.key === 'Fn') { // add task to end of list
+    if (e.key === 'Control') { // add task to end of list
       addTask();
     }
   }
